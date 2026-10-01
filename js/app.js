@@ -269,6 +269,7 @@ function addVote(playerId, username, isSuper, amount) {
     setTimeout(() => {
       sfxWin();
       renderArena();
+      celebrateWinner(p);
     }, 300);
   } else {
     updateTopBar();
@@ -545,4 +546,142 @@ function showSuperChatPopup(username, player, amount) {
   }, 6000);
   
   console.log('💰 Super popup shown for', displayName);
+}
+
+
+// ============================================
+// Sesi 4.1: Winner Celebration + Confetti
+// ============================================
+
+function celebrateWinner(player) {
+  // Trophy overlay
+  showTrophyOverlay(player);
+  // Confetti
+  startConfetti();
+  // Auto-reset setelah 10 detik
+  setTimeout(() => {
+    hideTrophyOverlay();
+    stopConfetti();
+    autoResetMatch();
+  }, 10000);
+}
+
+function showTrophyOverlay(player) {
+  const old = document.getElementById('trophyOverlay');
+  if (old) old.remove();
+  
+  const overlay = document.createElement('div');
+  overlay.id = 'trophyOverlay';
+  overlay.style.setProperty('--winner-color', player.color);
+  
+  overlay.innerHTML = 
+    '<div class="trophy-inner">' +
+      '<div class="trophy-icon">🏆</div>' +
+      '<div class="trophy-label">PEMENANG</div>' +
+      '<div class="trophy-name">' + player.emoji + ' ' + escapeHtml(player.name) + '</div>' +
+      '<div class="trophy-score">' + player.score + ' poin</div>' +
+      '<div class="trophy-next">Match berikutnya dalam <span id="nextTimer">10</span>s...</div>' +
+    '</div>';
+  
+  document.body.appendChild(overlay);
+  
+  // Countdown 10 → 0
+  let count = 10;
+  const timer = setInterval(() => {
+    count--;
+    const el = document.getElementById('nextTimer');
+    if (el) el.textContent = count;
+    if (count <= 0) clearInterval(timer);
+  }, 1000);
+}
+
+function hideTrophyOverlay() {
+  const o = document.getElementById('trophyOverlay');
+  if (o) {
+    o.classList.add('fade-out');
+    setTimeout(() => o.remove(), 500);
+  }
+}
+
+function autoResetMatch() {
+  state.players.forEach(p => p.score = 0);
+  state.matchNumber++;
+  saveState();
+  renderArena();
+  voteFeed.innerHTML = '';
+  console.log('🔄 Auto-reset untuk match #' + state.matchNumber);
+}
+
+// ============================================
+// Confetti System (Canvas overlay)
+// ============================================
+let confettiAnim = null;
+let confettiParticles = [];
+
+function startConfetti() {
+  stopConfetti();
+  
+  let canvas = document.getElementById('confettiCanvas');
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.id = 'confettiCanvas';
+    document.body.appendChild(canvas);
+  }
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  
+  // Generate particles
+  confettiParticles = [];
+  const colors = ['#fbbf24', '#ef4444', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6'];
+  for (let i = 0; i < 150; i++) {
+    confettiParticles.push({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 200,
+      vx: (Math.random() - 0.5) * 4,
+      vy: 2 + Math.random() * 4,
+      size: 4 + Math.random() * 8,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.3
+    });
+  }
+  
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    confettiParticles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.08; // gravity
+      p.rotation += p.rotSpeed;
+      
+      // Reset kalau jatuh keluar layar
+      if (p.y > canvas.height + 20) {
+        p.y = -20;
+        p.x = Math.random() * canvas.width;
+        p.vy = 2 + Math.random() * 4;
+      }
+      
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size * 0.5);
+      ctx.restore();
+    });
+    
+    confettiAnim = requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+function stopConfetti() {
+  if (confettiAnim) {
+    cancelAnimationFrame(confettiAnim);
+    confettiAnim = null;
+  }
+  const canvas = document.getElementById('confettiCanvas');
+  if (canvas) canvas.remove();
+  confettiParticles = [];
 }
