@@ -9,6 +9,9 @@
   "author": "fadingnotes9-cmd",
   "license": "MIT",
   "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
     "youtube-chat-next": "^3.1.0"
   }
 }

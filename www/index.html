@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0a15">
+  <title>⚔️ Vote Arena</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Vote Arena">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" href="assets/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+  
+  <div id="app">
+    <header id="topBar">
+      <div class="top-item">
+        <span class="label">MATCH</span>
+        <span id="matchNum" class="value">#1</span>
+      </div>
+      <div class="top-item center">
+        <span class="label">TARGET</span>
+        <span id="targetVal" class="value">100</span>
+      </div>
+      <div class="top-item right">
+        <span class="label">STATUS</span>
+        <span id="fbStatus" title="Firebase status">⏳</span>
+        <span id="status" class="value running">● LIVE</span>
+      </div>
+    </header>
+    
+    <main id="arena"></main>
+    
+    <footer id="bottomBar">
+      <div id="voteFeed"></div>
+      <div id="commandHint">💬 Ketik <b id="cmd1">!ronaldo</b> atau <b id="cmd2">!messi</b> di chat</div>
+    </footer>
+  </div>
+  
+  <button id="setupBtn">⚙️</button>
+  
+  <div id="setupModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>⚙️ Setup Arena</h2>
+      <div id="playerInputs"></div>
+      <button id="addPlayerBtn">+ Tambah Player</button>
+      <div class="modal-field">
+        <label>Target Poin:</label>
+        <input type="number" id="targetInput" value="100" min="10" max="9999">
+      </div>
+      <div class="modal-field">
+        <label>Match Number:</label>
+        <input type="number" id="matchInput" value="1" min="1">
+      </div>
+      <div class="modal-actions">
+        <button id="saveBtn" class="primary">💾 Simpan</button>
+        <button id="cancelBtn">Batal</button>
+        <button id="resetBtn" class="danger">🗑️ Reset Skor</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+  <!-- Firebase config + helper -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase.js"></script>
+
+  <!-- App -->
+  <script src="js/app.js"></script>
+  <script>
+    // Register Service Worker (PWA)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then((reg) => console.log('✅ SW registered:', reg.scope))
+          .catch((err) => console.warn('⚠️ SW failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>
