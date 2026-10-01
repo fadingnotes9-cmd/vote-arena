@@ -1012,3 +1012,262 @@ html, body {
 .vote-item strong {
   white-space: nowrap;
 }
+
+/* ============================================
+   FASE 2: Modal Sections (Background + Sound)
+   ============================================ */
+
+.modal-section {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 14px;
+    margin: 16px 0;
+}
+
+.modal-section h3 {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--c-accent);
+    margin: 0 0 12px 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Preset Background Buttons */
+.preset-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.preset-btn {
+    width: 42px;
+    height: 42px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.preset-btn:hover {
+    transform: scale(1.08);
+    border-color: rgba(255,255,255,0.5);
+}
+
+.preset-btn.active {
+    border-color: #fbbf24;
+    box-shadow: 0 0 12px rgba(251,191,36,0.6);
+    transform: scale(1.05);
+}
+
+/* Upload Row */
+.upload-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.upload-btn {
+    flex: 1;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+    border-radius: 8px;
+    text-align: center;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.upload-btn:active {
+    transform: scale(0.96);
+}
+
+.clear-btn {
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #e94560, #be123c);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.clear-btn:active {
+    transform: scale(0.96);
+}
+
+/* Preview */
+.bg-preview {
+    width: 100%;
+    height: 80px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.3);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+    overflow: hidden;
+    position: relative;
+}
+
+.bg-preview::before {
+    content: "Preview background";
+}
+
+.bg-preview.has-image::before {
+    content: "";
+}
+
+.bg-preview.has-image {
+    border: 2px solid #fbbf24;
+}
+
+/* ============================================
+   FASE 2 FIX: Modal Layout Better
+   ============================================ */
+
+/* Section lebih lega */
+.modal-section {
+    padding: 16px !important;
+    margin: 14px 0 !important;
+}
+
+/* Preset buttons gede + rapi */
+.preset-row {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 14px !important;
+}
+
+.preset-btn {
+    width: 100% !important;
+    height: 50px !important;
+    border-radius: 12px !important;
+    border: 2px solid rgba(255,255,255,0.25) !important;
+}
+
+.preset-btn.active {
+    border-color: #fbbf24 !important;
+    box-shadow: 0 0 0 3px rgba(251,191,36,0.4), 0 0 15px rgba(251,191,36,0.6) !important;
+    transform: scale(1.03) !important;
+}
+
+/* Upload + Clear full width */
+.upload-row {
+    display: grid !important;
+    grid-template-columns: 2fr 1fr !important;
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+}
+
+.upload-btn {
+    padding: 12px 10px !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.clear-btn {
+    padding: 12px 10px !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+}
+
+/* Preview lebih tinggi */
+.bg-preview {
+    height: 100px !important;
+    margin-top: 4px !important;
+    font-size: 12px !important;
+}
+
+/* Sound section */
+.modal-section .modal-field {
+    margin-bottom: 10px !important;
+}
+
+.modal-section .modal-field label {
+    font-size: 11px !important;
+    color: var(--c-text-dim) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 6px !important;
+    display: block !important;
+    text-transform: uppercase !important;
+}
+
+.modal-section .modal-field label.upload-btn {
+    text-transform: uppercase !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    color: #fff !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Tombol Test + Reset full row */
+.modal-section .modal-field[style*="display:flex"] {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    margin-bottom: 0 !important;
+}
+
+.modal-section .modal-field[style*="display:flex"] button {
+    padding: 12px 8px !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+}
+
+/* Title section */
+.modal-section h3 {
+    margin-bottom: 14px !important;
+    font-size: 15px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+/* Modal content lebih tinggi max */
+.modal-content {
+    max-height: 92vh !important;
+    padding: 20px !important;
+}
+
+/* Modal actions lebih rapi */
+.modal-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    margin-top: 18px !important;
+}
+
+.modal-actions button.danger {
+    grid-column: 1 / -1 !important;
+}
+
+.modal-actions button {
+    min-width: unset !important;
+    padding: 14px !important;
+}
