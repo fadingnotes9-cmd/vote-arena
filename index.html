@@ -18,6 +18,8 @@
   <canvas id="bgCanvas"></canvas>
   
   <div id="app">
+  <div id="antiBlankOverlay"></div>
+
     <header id="topBar">
       <div class="top-item">
         <span class="label">MATCH</span>
@@ -125,5 +127,18 @@
       });
     }
   </script>
-  </body>
+    <script id="anti-blank-script">
+    // Anti-blank: selalu ada gerakan di layar biar capture engine tahu layar hidup
+    (function() {
+        let t = 0;
+        setInterval(() => {
+            t++;
+            // Toggle opacity 0 → 0.01 → 0 untuk trigger repaint
+            const ov = document.getElementById('antiBlankOverlay');
+            if (ov) ov.style.opacity = (t % 2 === 0) ? '0.001' : '0.002';
+        }, 2000);
+        console.log('🛡️ Anti-blank active');
+    })();
+  </script>
+</body>
 </html>
