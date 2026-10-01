@@ -291,8 +291,10 @@ function addFeedItem(username, player, isSuper, amount) {
   if (!displayName.startsWith('@')) displayName = '@' + displayName;
   const superTag = isSuper ? '💰 ' + (amount || 'SUPER') + ' ' : '';
   const pointsLabel = isSuper ? ' (+5)' : '';
-  item.innerHTML = superTag + ' <strong>' + escapeHtml(displayName) + '</strong> → ' + 
-                   player.emoji + ' ' + escapeHtml(player.name) + pointsLabel;
+  const feedLine = (isSuper ? (superTag.trim() + ' ') : '') + 
+    '<strong>' + escapeHtml(displayName) + '</strong> → ' + 
+    player.emoji + ' ' + escapeHtml(player.name) + pointsLabel;
+  item.innerHTML = feedLine;
   voteFeed.appendChild(item);
   
   // Max 6 items

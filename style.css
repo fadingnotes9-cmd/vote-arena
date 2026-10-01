@@ -622,18 +622,7 @@ html, body {
   font-size: 48px !important;
 }
 
-/* Firebase status dot */
-#fbStatus {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  font-size: 14px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-}
 
-.top-item.right {
-  position: relative;
-}
 
 /* ============================================
    Sesi 3: Super Chat Styles
@@ -903,4 +892,123 @@ html, body {
   font-weight: 800;
   color: #fbbf24;
   font-size: 18px;
+}
+
+
+/* ============================================
+   Sesi 4.2a: Fix Firebase Dot Position
+   ============================================ */
+#fbStatus {
+  position: static !important;
+  font-size: 14px !important;
+  margin-left: 6px;
+  display: inline-block;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+
+.top-item.right {
+  position: relative;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 4px;
+}
+
+.top-item.right .label,
+.top-item.right .value {
+  position: static !important;
+}
+
+/* Wrapper label + status biar rapi */
+.top-item.right .label {
+  order: -1;
+}
+
+
+/* Progress bar shine animation */
+.player-progress-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.player-progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255,255,255,0.5) 50%, 
+    transparent 100%);
+  animation: shineSweep 2s ease-in-out infinite;
+}
+
+@keyframes shineSweep {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* ============================================
+   Sesi 4.2a Paste 2: Polish Tambahan
+   ============================================ */
+
+/* Responsive tweak untuk HP kecil */
+@media (max-width: 360px) {
+  .player-score { font-size: 38px !important; }
+  .player-name { font-size: 13px !important; }
+  .player-emoji { font-size: 28px !important; }
+  .top-item .value { font-size: 14px !important; }
+  .vote-item { font-size: 12px !important; padding: 6px 10px !important; }
+  #voteFeed { height: 80px !important; }
+}
+
+/* Responsive tweak untuk HP besar (tablet) */
+@media (min-width: 600px) {
+  .player-score { font-size: 64px !important; }
+  .player-name { font-size: 20px !important; }
+  .player-emoji { font-size: 48px !important; }
+  .top-item .value { font-size: 20px !important; }
+}
+
+/* Container 3+ player di HP kecil */
+@media (max-width: 500px) {
+  #arena.players-3,
+  #arena.players-4 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  #arena.players-5,
+  #arena.players-6 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* Smooth transition saat ganti warna */
+.player-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Card active state */
+.player-card:active {
+  transform: scale(0.98);
+}
+
+/* Border warna kartu sesuai player color */
+.player-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+}
+
+/* Vote item text wrapping (kalau username panjang) */
+.vote-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vote-item strong {
+  white-space: nowrap;
 }
