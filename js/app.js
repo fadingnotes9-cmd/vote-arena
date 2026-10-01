@@ -225,14 +225,16 @@ function escapeHtml(str) {
 // ============================================
 // Vote System
 // ============================================
-function addVote(playerId, username) {
+function addVote(playerId, username, isSuper, amount) {
   const p = state.players.find(x => x.id === playerId);
   if (!p) return false;
   
   // Cek sudah menang
   if (state.players.some(x => x.score >= state.target)) return false;
   
-  p.score++;
+  // Super Chat = 5 poin, biasa = 1 poin
+  const points = isSuper ? 5 : 1;
+  p.score += points;
   p.lastVoteBy = username || 'Anonim';
   
   saveState();
@@ -252,10 +254,15 @@ function addVote(playerId, username) {
   }
   
   // Feed
-  addFeedItem(username, p);
+  addFeedItem(username, p, isSuper, amount);
   
   // Sound
-  sfxVote();
+  if (isSuper && typeof sfxSuperChat === 'function') {
+    sfxSuperChat();
+    showSuperChatPopup(username, p, amount);
+  } else {
+    sfxVote();
+  }
   
   // Cek winner
   if (p.score >= state.target) {
@@ -273,15 +280,18 @@ function addVote(playerId, username) {
 // ============================================
 // Vote Feed
 // ============================================
-function addFeedItem(username, player) {
+function addFeedItem(username, player, isSuper, amount) {
   const item = document.createElement('div');
   item.className = 'vote-item';
+  if (isSuper) item.classList.add('vote-item-super');
   item.style.setProperty('--item-color', player.color);
   let displayName = String(username || 'user');
   // Kalau sudah ada @ di depan, jangan tambah @ lagi
   if (!displayName.startsWith('@')) displayName = '@' + displayName;
-  item.innerHTML = '<strong>' + escapeHtml(displayName) + '</strong> → ' + 
-                   player.emoji + ' ' + escapeHtml(player.name);
+  const superTag = isSuper ? '💰 ' + (amount || 'SUPER') + ' ' : '';
+  const pointsLabel = isSuper ? ' (+5)' : '';
+  item.innerHTML = superTag + ' <strong>' + escapeHtml(displayName) + '</strong> → ' + 
+                   player.emoji + ' ' + escapeHtml(player.name) + pointsLabel;
   voteFeed.appendChild(item);
   
   // Max 6 items
@@ -476,7 +486,7 @@ function setupFirebaseListener() {
     if (!data || !data.cmd) return;
     const player = findPlayerByCommand(data.cmd);
     if (player) {
-      addVote(player.id, data.username || 'Viewer');
+      addVote(player.id, data.username || 'Viewer', data.isSuper, data.amount);
     } else {
       console.log('⚠️ Unknown command:', data.cmd);
     }
@@ -494,3 +504,45 @@ window.addEventListener('load', () => {
     }
   }, 500);
 });
+
+// ============================================
+// Sesi 3: Super Chat Popup + Sound
+// ============================================
+
+function sfxSuperChat() {
+  // Fanfare mewah: C-E-G-C-E-G-C (2 oktaf)
+  const notes = [523, 659, 784, 1047, 1319, 1568, 2093];
+  notes.forEach((f, i) => {
+    setTimeout(() => playTone(f, 0.3, 'triangle', 0.18), i * 90);
+  });
+}
+
+function showSuperChatPopup(username, player, amount) {
+  // Remove existing popup
+  const old = document.getElementById('superPopup');
+  if (old) old.remove();
+  
+  const popup = document.createElement('div');
+  popup.id = 'superPopup';
+  popup.style.setProperty('--player-color', player.color);
+  
+  const displayName = String(username || 'user').replace(/^@+/, '');
+  
+  popup.innerHTML = 
+    '<div class="super-popup-inner">' +
+      '<div class="super-popup-label">💰 SUPER CHAT</div>' +
+      '<div class="super-popup-amount">' + escapeHtml(amount || 'SUPER') + '</div>' +
+      '<div class="super-popup-user">@' + escapeHtml(displayName) + '</div>' +
+      '<div class="super-popup-vote">→ ' + player.emoji + ' ' + escapeHtml(player.name) + ' (+5)</div>' +
+    '</div>';
+  
+  document.body.appendChild(popup);
+  
+  // Auto-remove setelah 6 detik
+  setTimeout(() => {
+    popup.classList.add('fade-out');
+    setTimeout(() => popup.remove(), 500);
+  }, 6000);
+  
+  console.log('💰 Super popup shown for', displayName);
+}

@@ -16,10 +16,13 @@ if (!VIDEO_ID) {
 }
 
 // Push vote ke Firebase via REST API
-async function pushVote(cmd, author) {
+async function pushVote(cmd, author, isSuper, amount, color) {
   const payload = {
     cmd: cmd,
     username: author,
+    isSuper: isSuper || false,
+    amount: amount || null,
+    color: color || null,
     timestamp: Date.now()
   };
   const url = DATABASE_URL + '/votes.json';
@@ -46,6 +49,15 @@ chat.on('chat', async (msg) => {
     ? msg.message.map(p => p.text || p.emojiText || '').join('').trim()
     : String(msg.message || '').trim();
 
+  // Detect Super Chat
+  const isSuper = !!(msg.superchat && msg.superchat.amount);
+  const scAmount = isSuper ? msg.superchat.amount : null;
+  const scColor = isSuper ? msg.superchat.color : null;
+  
+  if (isSuper) {
+    console.log(`💰 SUPER CHAT: ${author} — ${scAmount}`);
+  }
+
   // Cek command vote
   if (message.startsWith('!')) {
     const cmd = message.substring(1).toLowerCase().trim();
@@ -53,8 +65,9 @@ chat.on('chat', async (msg) => {
     if (cmd && /^[a-z0-9_]{1,20}$/.test(cmd)) {
       console.log(`💬 [${author}] ${message} → cmd: ${cmd}`);
       try {
-        await pushVote(cmd, author);
-        console.log(`✅ VOTE: ${cmd} by ${author}`);
+        await pushVote(cmd, author, isSuper, scAmount, scColor);
+        const tag = isSuper ? `💰 SUPER +5` : '✅ VOTE';
+        console.log(`${tag}: ${cmd} by ${author}`);
       } catch (err) {
         console.error('❌ Failed push:', err.message);
       }
