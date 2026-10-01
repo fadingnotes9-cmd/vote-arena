@@ -1107,3 +1107,60 @@ window.addEventListener('load', () => {
     };
     console.log('🎵 addVote hooked for player sounds');
 });
+
+
+// ============================================
+// REBUILD: Dynamic Marquee Text
+// ============================================
+function updateMarqueeText() {
+    const el = document.getElementById('marqueeText');
+    if (!el) return;
+
+    // Ambil nama player aktif
+    const names = state.players.map(p => p.name.toUpperCase());
+    const playerList = names.length > 0 
+        ? names.map(n => '<strong>' + escapeHtml(n) + '</strong>').join(' ATAU ')
+        : '<strong>PEMAIN 1</strong> ATAU <strong>PEMAIN 2</strong>';
+
+    // Tagline bergantian
+    const tagline = 
+        '⚽ KETIK ' + playerList + ' DI CHAT UNTUK VOTE' +
+        ' &nbsp;&nbsp; ⚽ SUPER CHAT = +5 POIN' +
+        ' &nbsp;&nbsp; 🏆 FIRST TO ' + state.target + ' MENANG!' +
+        ' &nbsp;&nbsp; 🎉 TROPHY + CONFETTI UNTUK PEMENANG' +
+        ' &nbsp;&nbsp; 💬 KETIK ' + playerList + ' DI CHAT UNTUK VOTE' +
+        ' &nbsp;&nbsp; ⚽ SUPER CHAT = +5 POIN' +
+        ' &nbsp;&nbsp; 🏆 FIRST TO ' + state.target + ' MENANG!';
+
+    el.innerHTML = tagline;
+}
+
+// Override renderArena untuk update marquee juga
+const originalRenderArena = window.renderArena || null;
+if (typeof window.renderArena === 'function' && !window.__renderArenaHooked) {
+    window.__renderArenaHooked = true;
+    const original = window.renderArena;
+    window.renderArena = function() {
+        const result = original.apply(this, arguments);
+        updateMarqueeText();
+        return result;
+    };
+    console.log('🎬 renderArena hooked to update marquee');
+}
+
+// Initial update saat DOM ready
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(updateMarqueeText, 200);
+});
+
+// Update saat setup disimpan (player berubah)
+window.addEventListener('load', () => {
+    const saveBtn = document.getElementById('saveBtn');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            setTimeout(updateMarqueeText, 100);
+        });
+    }
+});
+
+console.log('✅ Marquee dynamic text ready');

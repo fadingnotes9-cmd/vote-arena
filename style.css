@@ -1402,15 +1402,15 @@ html, body {
     }
 }
 
+
+
 /* ============================================
-   FIX 4: Marquee Bar (teks berjalan)
+   REBUILD: Layout Baru (elemen penting di ATAS)
    ============================================ */
+
 #marqueeBar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 38px;
+    width: 100%;
+    height: 36px;
     background: linear-gradient(90deg, 
         rgba(251, 191, 36, 0.95) 0%, 
         rgba(245, 158, 11, 0.95) 50%, 
@@ -1418,22 +1418,21 @@ html, body {
     color: #1a1a2e;
     font-family: var(--font-heading);
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: 0.5px;
     overflow: hidden;
-    z-index: 15;
-    box-shadow: 0 -4px 20px rgba(251, 191, 36, 0.4);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(251, 191, 36, 0.35);
+    flex-shrink: 0;
     display: flex;
     align-items: center;
-    padding: 0;
-    box-sizing: border-box;
 }
 
 #marqueeText {
     display: inline-block;
     white-space: nowrap;
-    animation: marqueeScroll 45s linear infinite;
-    padding-left: 100vw;
+    animation: marqueeScroll 40s linear infinite;
+    padding-left: 100%;
     text-transform: uppercase;
 }
 
@@ -1443,6 +1442,7 @@ html, body {
     padding: 2px 8px;
     border-radius: 4px;
     font-weight: 800;
+    margin: 0 4px;
 }
 
 @keyframes marqueeScroll {
@@ -1450,7 +1450,56 @@ html, body {
     to   { transform: translateX(-100%); }
 }
 
-/* Beri ruang untuk marquee di bottom */
-#app {
-    padding-bottom: 50px !important;
+/* Vote Feed di ATAS arena */
+#voteFeed {
+    width: 100%;
+    height: auto;
+    max-height: 120px;
+    min-height: 0;
+    background: rgba(10, 10, 21, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+#voteFeed:empty {
+    display: none;
+}
+
+#voteFeed .vote-item {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.06);
+    border-left: 3px solid var(--item-color, #fff);
+    animation: voteSlide 0.4s ease-out;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#voteFeed .vote-item strong {
+    color: var(--item-color, #fff);
+}
+
+@keyframes voteSlide {
+    from { transform: translateX(-20px); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+}
+
+/* Arena menyesuaikan sisa ruang */
+#arena {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px;
 }
