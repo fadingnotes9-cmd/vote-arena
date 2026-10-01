@@ -137,9 +137,6 @@ public class RTMPPlugin extends Plugin implements ConnectChecker {
                 if (rtmpDisplay.isStreaming()) {
                     rtmpDisplay.stopStream();
                 }
-                if (useService) {
-                    try { rtmpDisplay.stopService(); } catch (Exception ignored) {}
-                }
                 rtmpDisplay = null;
             }
             JSObject ret = new JSObject();
