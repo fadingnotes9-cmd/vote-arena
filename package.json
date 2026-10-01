@@ -1,0 +1,11 @@
+{
+  "name": "vote-arena",
+  "version": "1.0.0",
+  "description": "Live vote scoreboard untuk YouTube streaming",
+  "scripts": {
+    "dev": "serve -p 8080",
+    "check": "node --check js/app.js && echo 'Syntax OK'"
+  },
+  "author": "fadingnotes9-cmd",
+  "license": "MIT"
+}
