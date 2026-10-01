@@ -41,6 +41,13 @@ public class RTMPPlugin extends Plugin implements ConnectChecker {
     private String currentKey;
     private boolean useService = false;
     private PluginCall pendingCall = null;
+    private static RTMPPlugin instance = null;
+
+    @Override
+    public void load() {
+        instance = this;
+        Log.i(TAG, "Plugin loaded, instance stored");
+    }
 
     @PluginMethod
     public void ping(PluginCall call) {
@@ -66,46 +73,89 @@ public class RTMPPlugin extends Plugin implements ConnectChecker {
 
         this.currentUrl = url;
         this.currentKey = key;
-        // Force true — native flow untuk Android 14+
-        this.useService = true;
+        this.pendingCall = call;
 
-        // Build full URL
-        String fullUrl = url;
-        if (!fullUrl.endsWith("/")) fullUrl += "/";
-        fullUrl += key;
+        try {
+            android.app.Activity activity = getActivity();
+            if (activity instanceof MainActivity) {
+                Log.i(TAG, "Delegating permission request to MainActivity");
+                ((MainActivity) activity).requestScreenCapture();
+            } else {
+                call.reject("Activity bukan MainActivity");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "startStream error", e);
+            call.reject("Error: " + e.getMessage());
+        }
+    }
+
+    // Dipanggil dari MainActivity.onActivityResult
+    public static void onPermissionResult(int resultCode, Intent data) {
+        if (instance == null) {
+            android.util.Log.e(TAG, "instance null — plugin belum load");
+            return;
+        }
+        instance.handlePermission(resultCode, data);
+    }
+
+    private void handlePermission(int resultCode, Intent data) {
+        Log.i(TAG, "handlePermission resultCode=" + resultCode);
+
+        if (resultCode != Activity.RESULT_OK || data == null) {
+            JSObject ret = new JSObject();
+            ret.put("status", "cancelled");
+            ret.put("message", "Izin ditolak/dibatalkan");
+            if (pendingCall != null) {
+                pendingCall.resolve(ret);
+                pendingCall = null;
+            }
+            JSObject statusData = new JSObject();
+            statusData.put("status", "cancelled");
+            statusData.put("message", "Dibatalkan");
+            notifyListeners("rtmpStatus", statusData);
+            return;
+        }
 
         try {
             android.app.Activity activity = getActivity();
             if (activity == null) {
-                call.reject("Activity tidak tersedia");
+                Log.e(TAG, "Activity null");
                 return;
             }
 
-            Log.i(TAG, "=== Native flow — RootEncoder handle permission ===");
+            Log.i(TAG, "Creating RtmpDisplay (useService=false)");
+            rtmpDisplay = new RtmpDisplay(activity, false, this);
+            rtmpDisplay.setIntentResult(resultCode, data);
 
-            // RootEncoder native flow: library yang handle MediaProjection permission
-            rtmpDisplay = new RtmpDisplay(activity, useService, this);
             rtmpDisplay.prepareVideo(
                 VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_FPS,
                 VIDEO_BITRATE, VIDEO_ROTATION, VIDEO_DPI
             );
             rtmpDisplay.prepareAudio(AUDIO_BITRATE, AUDIO_SAMPLE_RATE, AUDIO_STEREO);
 
-            // startStream() internally request permission via ScreenService
+            String fullUrl = currentUrl;
+            if (!fullUrl.endsWith("/")) fullUrl += "/";
+            fullUrl += currentKey;
+
+            Log.i(TAG, "Starting stream: " + fullUrl.substring(0, Math.min(fullUrl.length(), 40)) + "...");
             rtmpDisplay.startStream(fullUrl);
 
             JSObject ret = new JSObject();
             ret.put("status", "starting");
-            ret.put("message", "Menunggu izin screen capture...");
-            ret.put("resolution", VIDEO_WIDTH + "x" + VIDEO_HEIGHT);
-            ret.put("fps", VIDEO_FPS);
-            call.resolve(ret);
+            ret.put("message", "Menghubungkan ke YouTube...");
+            if (pendingCall != null) {
+                pendingCall.resolve(ret);
+                pendingCall = null;
+            }
         } catch (Exception e) {
-            Log.e(TAG, "startStream error", e);
+            Log.e(TAG, "handlePermission error", e);
             JSObject ret = new JSObject();
             ret.put("status", "error");
-            ret.put("message", e.getMessage() != null ? e.getMessage() : "Unknown error");
-            call.resolve(ret);
+            ret.put("message", e.getMessage());
+            if (pendingCall != null) {
+                pendingCall.resolve(ret);
+                pendingCall = null;
+            }
         }
     }
 
