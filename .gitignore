@@ -4,7 +4,6 @@ package-lock.json
 .env.local
 *.key
 *.pem
-firebase-config.js
 .DS_Store
 *.log
 .vscode/
