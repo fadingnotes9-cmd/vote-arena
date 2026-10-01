@@ -85,7 +85,35 @@
       });
     }
   </script>
-  <button id="testRtmpBtn" style="position:fixed;top:80px;right:15px;z-index:100;padding:8px 12px;font-size:11px;font-family:'Nunito',sans-serif;font-weight:800;background:rgba(251,191,36,0.9);color:#1a1a2e;border:none;border-radius:8px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.4);">🔌 Test RTMP</button>
+  <button id="testRtmpBtn" style="position:fixed;top:70px;left:15px;z-index:100;padding:8px 12px;font-size:11px;font-family:'Nunito',sans-serif;font-weight:800;background:rgba(251,191,36,0.9);color:#1a1a2e;border:none;border-radius:8px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.4);">🔌 Test RTMP</button>
+  <button id="rtmpLiveBtn" style="position:fixed;top:130px;left:15px;z-index:100;padding:10px 14px;font-size:12px;font-family:'Nunito',sans-serif;font-weight:800;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none;border-radius:10px;cursor:pointer;box-shadow:0 4px 15px rgba(220,38,38,0.5);">🔴 LIVE</button>
+
+  <div id="rtmpModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.9);align-items:center;justify-content:center;padding:20px;font-family:'Nunito',sans-serif;">
+    <div style="background:linear-gradient(160deg,#1a1a2e,#0a0a15);border:2px solid #dc2626;border-radius:20px;padding:24px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.7);">
+      <h2 style="color:#dc2626;font-size:20px;margin:0 0 16px 0;text-align:center;letter-spacing:1px;">🎬 LIVE STREAMING</h2>
+      
+      <div id="rtmpStatusBox" style="background:rgba(0,0,0,0.4);border-left:3px solid #fbbf24;padding:10px 14px;border-radius:8px;margin-bottom:16px;font-size:12px;color:#a0a0b0;">
+        Status: <span id="rtmpStatusText" style="color:#fbbf24;font-weight:800;">Siap</span>
+      </div>
+
+      <label style="display:block;font-size:11px;color:#a0a0b0;font-weight:800;letter-spacing:1px;margin-bottom:6px;">RTMP URL</label>
+      <input id="rtmpUrlInput" type="text" value="rtmp://a.rtmp.youtube.com/live2" placeholder="rtmp://..." style="width:100%;padding:12px;border-radius:8px;border:2px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.5);color:#fff;font-size:13px;font-family:monospace;outline:none;margin-bottom:12px;box-sizing:border-box;">
+
+      <label style="display:block;font-size:11px;color:#a0a0b0;font-weight:800;letter-spacing:1px;margin-bottom:6px;">STREAM KEY</label>
+      <input id="rtmpKeyInput" type="text" placeholder="abcd-1234-efgh-5678" style="width:100%;padding:12px;border-radius:8px;border:2px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.5);color:#fff;font-size:13px;font-family:monospace;outline:none;margin-bottom:16px;box-sizing:border-box;">
+
+      <div style="background:rgba(251,191,36,0.1);border-radius:8px;padding:8px 12px;margin-bottom:16px;font-size:11px;color:#a0a0b0;line-height:1.5;">
+        💡 Ambil dari <b style="color:#fbbf24;">YouTube Studio → Create → Go Live</b>
+      </div>
+
+      <div style="display:flex;gap:8px;">
+        <button id="rtmpStartBtn" style="flex:1;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;font-weight:800;font-family:'Nunito',sans-serif;font-size:14px;cursor:pointer;">▶ START LIVE</button>
+        <button id="rtmpStopBtn" style="flex:1;padding:14px;border:none;border-radius:10px;background:rgba(255,255,255,0.1);color:#fff;font-weight:800;font-family:'Nunito',sans-serif;font-size:14px;cursor:pointer;display:none;">⏹ STOP</button>
+        <button id="rtmpCloseBtn" style="padding:14px 18px;border:none;border-radius:10px;background:rgba(255,255,255,0.1);color:#fff;font-weight:800;font-family:'Nunito',sans-serif;font-size:14px;cursor:pointer;">✕</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/rtmp.js"></script>
 </body>
 </html>
