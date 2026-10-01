@@ -277,7 +277,10 @@ function addFeedItem(username, player) {
   const item = document.createElement('div');
   item.className = 'vote-item';
   item.style.setProperty('--item-color', player.color);
-  item.innerHTML = '<strong>@' + escapeHtml(username || 'user') + '</strong> → ' + 
+  let displayName = String(username || 'user');
+  // Kalau sudah ada @ di depan, jangan tambah @ lagi
+  if (!displayName.startsWith('@')) displayName = '@' + displayName;
+  item.innerHTML = '<strong>' + escapeHtml(displayName) + '</strong> → ' + 
                    player.emoji + ' ' + escapeHtml(player.name);
   voteFeed.appendChild(item);
   
@@ -448,3 +451,46 @@ function init() {
 }
 
 init();
+
+// ============================================
+// Task 2.4: Firebase Listener Integration
+// ============================================
+
+// Mapping command → player (case-insensitive)
+function findPlayerByCommand(cmd) {
+  if (!cmd) return null;
+  const lower = cmd.toLowerCase().trim();
+  return state.players.find(p => 
+    p.name.toLowerCase() === lower ||
+    lower.includes(p.name.toLowerCase())
+  );
+}
+
+// Subscribe vote baru dari Firebase
+function setupFirebaseListener() {
+  if (typeof onNewVote !== 'function') {
+    console.warn('⚠️ firebase.js belum loaded');
+    return;
+  }
+  onNewVote((data) => {
+    if (!data || !data.cmd) return;
+    const player = findPlayerByCommand(data.cmd);
+    if (player) {
+      addVote(player.id, data.username || 'Viewer');
+    } else {
+      console.log('⚠️ Unknown command:', data.cmd);
+    }
+  });
+  console.log('✅ Firebase vote listener active');
+}
+
+// Wire setelah DOM + firebase ready
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if (typeof db !== 'undefined' && db) {
+      setupFirebaseListener();
+    } else {
+      setTimeout(setupFirebaseListener, 1000);
+    }
+  }, 500);
+});

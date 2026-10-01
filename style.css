@@ -621,3 +621,16 @@ html, body {
 .player-score {
   font-size: 48px !important;
 }
+
+/* Firebase status dot */
+#fbStatus {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 14px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.top-item.right {
+  position: relative;
+}
