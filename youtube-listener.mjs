@@ -58,19 +58,29 @@ chat.on('chat', async (msg) => {
     console.log(`💰 SUPER CHAT: ${author} — ${scAmount}`);
   }
 
-  // Cek command vote
-  if (message.startsWith('!')) {
-    const cmd = message.substring(1).toLowerCase().trim();
-    // Validasi: hanya huruf, angka, underscore (max 20 char)
-    if (cmd && /^[a-z0-9_]{1,20}$/.test(cmd)) {
-      console.log(`💬 [${author}] ${message} → cmd: ${cmd}`);
-      try {
-        await pushVote(cmd, author, isSuper, scAmount, scColor);
-        const tag = isSuper ? `💰 SUPER +5` : '✅ VOTE';
-        console.log(`${tag}: ${cmd} by ${author}`);
-      } catch (err) {
-        console.error('❌ Failed push:', err.message);
-      }
+  // === AUTO-DETECT VOTE ===
+  // Deteksi kata "messi" atau "ronaldo" di mana pun dalam pesan
+  const msgLower = message.toLowerCase();
+  const hasMessi = msgLower.includes('messi');
+  const hasRonaldo = msgLower.includes('ronaldo');
+
+  let cmd = null;
+  if (hasMessi && !hasRonaldo) {
+    cmd = 'messi';
+  } else if (hasRonaldo && !hasMessi) {
+    cmd = 'ronaldo';
+  } else if (hasMessi && hasRonaldo) {
+    console.log(`⏭️ [${author}] keduanya disebut, skip: ${message}`);
+  }
+
+  if (cmd) {
+    console.log(`💬 [${author}] ${message} → vote ${cmd}`);
+    try {
+      await pushVote(cmd, author, isSuper, scAmount, scColor);
+      const tag = isSuper ? `💰 SUPER +5` : '✅ VOTE';
+      console.log(`${tag}: ${cmd} by ${author}`);
+    } catch (err) {
+      console.error('❌ Failed push:', err.message);
     }
   }
 });
