@@ -1361,3 +1361,96 @@ html, body {
     opacity: 0.3;
     cursor: not-allowed;
 }
+
+
+/* ============================================
+   FIX 1: Vote Feed Position (tidak kepotong)
+   ============================================ */
+#bottomBar {
+    padding: 12px 14px !important;
+    margin-bottom: 0 !important;
+}
+
+#voteFeed {
+    height: 90px !important;
+    max-height: 90px !important;
+    gap: 5px !important;
+    margin-bottom: 8px !important;
+}
+
+.vote-item {
+    font-size: 13px !important;
+    padding: 7px 12px !important;
+    min-height: 28px !important;
+}
+
+#commandHint {
+    margin-top: 2px !important;
+    font-size: 12px !important;
+    padding: 6px 0 2px 0 !important;
+}
+
+/* ============================================
+   FIX 3: Full Screen (safe area aware)
+   ============================================ */
+@supports (padding: env(safe-area-inset-bottom)) {
+    #app {
+        padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+    }
+    #bottomBar {
+        margin-bottom: env(safe-area-inset-bottom) !important;
+    }
+}
+
+/* ============================================
+   FIX 4: Marquee Bar (teks berjalan)
+   ============================================ */
+#marqueeBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 38px;
+    background: linear-gradient(90deg, 
+        rgba(251, 191, 36, 0.95) 0%, 
+        rgba(245, 158, 11, 0.95) 50%, 
+        rgba(251, 191, 36, 0.95) 100%);
+    color: #1a1a2e;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    overflow: hidden;
+    z-index: 15;
+    box-shadow: 0 -4px 20px rgba(251, 191, 36, 0.4);
+    display: flex;
+    align-items: center;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#marqueeText {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marqueeScroll 45s linear infinite;
+    padding-left: 100vw;
+    text-transform: uppercase;
+}
+
+#marqueeText strong {
+    background: #1a1a2e;
+    color: #fbbf24;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 800;
+}
+
+@keyframes marqueeScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-100%); }
+}
+
+/* Beri ruang untuk marquee di bottom */
+#app {
+    padding-bottom: 50px !important;
+}
