@@ -7,13 +7,11 @@ import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.util.Log;
 
-import androidx.activity.result.ActivityResult;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
-import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.pedro.common.ConnectChecker;
 import com.pedro.library.rtmp.RtmpDisplay;
@@ -68,9 +66,14 @@ public class RTMPPlugin extends Plugin implements ConnectChecker {
 
         this.currentUrl = url;
         this.currentKey = key;
-        this.useService = Build.VERSION.SDK_INT >= 34;
+        // Force true — native flow untuk Android 14+
+        this.useService = true;
 
-        // Minta izin screen capture via MediaProjection
+        // Build full URL
+        String fullUrl = url;
+        if (!fullUrl.endsWith("/")) fullUrl += "/";
+        fullUrl += key;
+
         try {
             android.app.Activity activity = getActivity();
             if (activity == null) {
@@ -78,84 +81,31 @@ public class RTMPPlugin extends Plugin implements ConnectChecker {
                 return;
             }
 
-            MediaProjectionManager mpm = (MediaProjectionManager)
-                activity.getSystemService(Context.MEDIA_PROJECTION_SERVICE);
-            if (mpm == null) {
-                call.reject("MediaProjectionManager tidak tersedia");
-                return;
-            }
+            Log.i(TAG, "=== Native flow — RootEncoder handle permission ===");
 
-            Intent intent = mpm.createScreenCaptureIntent();
-            if (intent == null) {
-                call.reject("Gagal buat screen capture intent");
-                return;
-            }
-
-            Log.i(TAG, "Intent action: " + intent.getAction());
-            Log.i(TAG, "Intent component: " + intent.getComponent());
-            Log.i(TAG, "Launching activity for result...");
-
-            // Simpan call untuk dipakai nanti di callback
-            this.pendingCall = call;
-            startActivityForResult(call, intent, "handleScreenCaptureResult");
-            Log.i(TAG, "Screen capture permission requested");
-        } catch (Exception e) {
-            Log.e(TAG, "MediaProjection error", e);
-            call.reject("Gagal minta izin: " + e.getMessage());
-        }
-    }
-
-    @ActivityCallback
-    private void handleScreenCaptureResult(PluginCall call, ActivityResult result) {
-        Log.i(TAG, "Screen capture result code: " + result.getResultCode());
-
-        if (result.getResultCode() != Activity.RESULT_OK) {
-            Log.w(TAG, "Screen capture cancelled/denied");
-            JSObject ret = new JSObject();
-            ret.put("status", "cancelled");
-            ret.put("message", "Dibatalkan user");
-            if (call != null) call.resolve(ret);
-            // Beritahu UI untuk reset status
-            JSObject statusData = new JSObject();
-            statusData.put("status", "cancelled");
-            statusData.put("message", "Izin dibatalkan");
-            notifyListeners("rtmpStatus", statusData);
-            return;
-        }
-
-        try {
-            // Inisialisasi RtmpDisplay
-            rtmpDisplay = new RtmpDisplay(getContext(), useService, this);
-            rtmpDisplay.setIntentResult(result.getResultCode(), result.getData());
-
-            // Konfigurasi video & audio
+            // RootEncoder native flow: library yang handle MediaProjection permission
+            rtmpDisplay = new RtmpDisplay(activity, useService, this);
             rtmpDisplay.prepareVideo(
                 VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_FPS,
                 VIDEO_BITRATE, VIDEO_ROTATION, VIDEO_DPI
             );
             rtmpDisplay.prepareAudio(AUDIO_BITRATE, AUDIO_SAMPLE_RATE, AUDIO_STEREO);
 
-            // URL lengkap = URL + "/" + StreamKey
-            String fullUrl = currentUrl;
-            if (!fullUrl.endsWith("/")) fullUrl += "/";
-            fullUrl += currentKey;
-
+            // startStream() internally request permission via ScreenService
             rtmpDisplay.startStream(fullUrl);
-            Log.i(TAG, "Stream started, waiting for connection...");
 
             JSObject ret = new JSObject();
             ret.put("status", "starting");
-            ret.put("message", "Menghubungkan ke YouTube...");
+            ret.put("message", "Menunggu izin screen capture...");
             ret.put("resolution", VIDEO_WIDTH + "x" + VIDEO_HEIGHT);
             ret.put("fps", VIDEO_FPS);
-            ret.put("bitrateKbps", VIDEO_BITRATE / 1024);
-            if (call != null) call.resolve(ret);
+            call.resolve(ret);
         } catch (Exception e) {
             Log.e(TAG, "startStream error", e);
             JSObject ret = new JSObject();
             ret.put("status", "error");
             ret.put("message", e.getMessage() != null ? e.getMessage() : "Unknown error");
-            if (call != null) call.resolve(ret);
+            call.resolve(ret);
         }
     }
 
