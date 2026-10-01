@@ -261,7 +261,7 @@ function addVote(playerId, username, isSuper, amount) {
     sfxSuperChat();
     showSuperChatPopup(username, p, amount);
   } else {
-    sfxVote();
+    playVoteSound();
   }
   
   // Cek winner
@@ -687,3 +687,280 @@ function stopConfetti() {
   if (canvas) canvas.remove();
   confettiParticles = [];
 }
+
+// ============================================
+// FASE 2: Background + Sound Customization
+// ============================================
+
+const BG_KEY = 'vote-arena-bg';
+const BG_PRESET_KEY = 'vote-arena-bg-preset';
+const SOUND_KEY = 'vote-arena-sound';
+
+// ============================================
+// Apply Background
+// ============================================
+function applyBackground() {
+    const body = document.body;
+    let bg = null;
+    let preset = null;
+    try {
+        bg = localStorage.getItem(BG_KEY);
+        preset = localStorage.getItem(BG_PRESET_KEY);
+    } catch (e) {}
+
+    // Reset
+    body.style.backgroundImage = '';
+    body.style.background = '';
+
+    if (bg) {
+        // Gambar custom
+        body.style.backgroundImage = 'url(' + bg + ')';
+        body.style.backgroundSize = 'cover';
+        body.style.backgroundPosition = 'center';
+        body.style.backgroundAttachment = 'fixed';
+        updateBgPreview(bg);
+        console.log('🖼️ Custom background applied');
+    } else if (preset) {
+        // Preset gradient
+        const presets = {
+            default: 'linear-gradient(160deg, #1e1b4b, #0a0a15)',
+            ocean:   'linear-gradient(160deg, #0c4a6e, #082f49)',
+            forest:  'linear-gradient(160deg, #064e3b, #0a0a15)',
+            sunset:  'linear-gradient(160deg, #831843, #0a0a15)',
+            royal:   'linear-gradient(160deg, #4c1d95, #0a0a15)'
+        };
+        body.style.background = presets[preset] || presets.default;
+        body.style.backgroundAttachment = 'fixed';
+        updateBgPreview(null, preset);
+        console.log('🎨 Preset applied:', preset);
+    } else {
+        // Default
+        body.style.background = 'linear-gradient(160deg, #1e1b4b, #0a0a15)';
+        body.style.backgroundAttachment = 'fixed';
+    }
+}
+
+function updateBgPreview(dataUrl, preset) {
+    const prev = document.getElementById('bgPreview');
+    if (!prev) return;
+    if (dataUrl) {
+        prev.style.backgroundImage = 'url(' + dataUrl + ')';
+        prev.classList.add('has-image');
+    } else if (preset) {
+        const presets = {
+            default: 'linear-gradient(160deg, #1e1b4b, #0a0a15)',
+            ocean:   'linear-gradient(160deg, #0c4a6e, #082f49)',
+            forest:  'linear-gradient(160deg, #064e3b, #0a0a15)',
+            sunset:  'linear-gradient(160deg, #831843, #0a0a15)',
+            royal:   'linear-gradient(160deg, #4c1d95, #0a0a15)'
+        };
+        prev.style.background = presets[preset] || presets.default;
+        prev.style.backgroundImage = '';
+        prev.classList.remove('has-image');
+    } else {
+        prev.style.backgroundImage = '';
+        prev.style.background = 'rgba(0,0,0,0.3)';
+        prev.classList.remove('has-image');
+    }
+}
+
+// ============================================
+// Compress Image (biar tidak exceed localStorage 5MB)
+// ============================================
+function compressImage(file, maxWidth, quality, callback) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            if (w > maxWidth) {
+                h = Math.round(h * (maxWidth / w));
+                w = maxWidth;
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            callback(dataUrl);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// ============================================
+// Sound Handling
+// ============================================
+let customVoteSound = null;
+
+function loadCustomSound() {
+    try {
+        const saved = localStorage.getItem(SOUND_KEY);
+        if (saved) {
+            customVoteSound = new Audio(saved);
+            customVoteSound.volume = 0.7;
+            console.log('🔊 Custom sound loaded');
+        }
+    } catch (e) {
+        console.warn('Sound load error:', e);
+    }
+}
+
+function playVoteSound() {
+    if (customVoteSound) {
+        customVoteSound.currentTime = 0;
+        customVoteSound.play().catch(e => {
+            console.warn('Sound play error:', e);
+            if (typeof sfxVote === 'function') sfxVote();
+        });
+    } else if (typeof sfxVote === 'function') {
+        sfxVote();
+    }
+}
+
+// ============================================
+// Setup handlers saat DOM ready
+// ============================================
+window.addEventListener('DOMContentLoaded', () => {
+    // Apply background tersimpan
+    applyBackground();
+    // Load custom sound
+    loadCustomSound();
+
+    // === Preset buttons ===
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const preset = btn.dataset.preset;
+            // Visual active state
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Clear uploaded background
+            try {
+                localStorage.removeItem(BG_KEY);
+                localStorage.setItem(BG_PRESET_KEY, preset);
+            } catch (e) {}
+
+            // Apply immediately
+            const color1 = btn.dataset.color1;
+            const color2 = btn.dataset.color2;
+            document.body.style.backgroundImage = '';
+            document.body.style.background = 'linear-gradient(160deg, ' + color1 + ', ' + color2 + ')';
+            document.body.style.backgroundAttachment = 'fixed';
+            updateBgPreview(null, preset);
+            console.log('🎨 Preset clicked:', preset);
+        });
+    });
+
+    // Mark active preset dari localStorage
+    try {
+        const saved = localStorage.getItem(BG_PRESET_KEY);
+        if (saved) {
+            const activeBtn = document.querySelector('.preset-btn[data-preset="' + saved + '"]');
+            if (activeBtn) {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                activeBtn.classList.add('active');
+            }
+        }
+    } catch (e) {}
+
+    // === Upload Background ===
+    const bgInput = document.getElementById('bgUploadInput');
+    if (bgInput) {
+        bgInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            console.log('📁 Background file:', file.name, (file.size/1024).toFixed(0) + 'KB');
+
+            // Compress: max 1080px, quality 0.7
+            compressImage(file, 1080, 0.7, (dataUrl) => {
+                const sizeKB = Math.round(dataUrl.length * 0.75 / 1024);
+                console.log('🗜️ Compressed to:', sizeKB + 'KB');
+
+                if (sizeKB > 4000) {
+                    alert('Gambar terlalu besar (' + sizeKB + 'KB). Coba gambar lebih kecil.');
+                    return;
+                }
+
+                try {
+                    localStorage.setItem(BG_KEY, dataUrl);
+                    localStorage.removeItem(BG_PRESET_KEY);
+                    applyBackground();
+                    console.log('✅ Background saved');
+                } catch (e) {
+                    alert('Gagal simpan: ' + e.message);
+                }
+            });
+        });
+    }
+
+    // === Clear Background ===
+    const bgClear = document.getElementById('bgClearBtn');
+    if (bgClear) {
+        bgClear.addEventListener('click', () => {
+            if (!confirm('Hapus background custom?')) return;
+            try {
+                localStorage.removeItem(BG_KEY);
+                localStorage.removeItem(BG_PRESET_KEY);
+            } catch (e) {}
+            applyBackground();
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            const def = document.querySelector('.preset-btn[data-preset="default"]');
+            if (def) def.classList.add('active');
+            console.log('🗑️ Background cleared');
+        });
+    }
+
+    // === Upload Sound ===
+    const soundInput = document.getElementById('soundUploadInput');
+    if (soundInput) {
+        soundInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            console.log('🎵 Sound file:', file.name, (file.size/1024).toFixed(0) + 'KB');
+
+            if (file.size > 300 * 1024) {
+                alert('Suara terlalu besar. Max 300KB.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    localStorage.setItem(SOUND_KEY, ev.target.result);
+                    customVoteSound = new Audio(ev.target.result);
+                    customVoteSound.volume = 0.7;
+                    console.log('✅ Sound saved');
+                    alert('Suara berhasil disimpan!');
+                } catch (e) {
+                    alert('Gagal simpan suara: ' + e.message);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // === Test Sound ===
+    const soundTest = document.getElementById('soundTestBtn');
+    if (soundTest) {
+        soundTest.addEventListener('click', () => {
+            playVoteSound();
+        });
+    }
+
+    // === Clear Sound ===
+    const soundClear = document.getElementById('soundClearBtn');
+    if (soundClear) {
+        soundClear.addEventListener('click', () => {
+            if (!confirm('Reset suara ke default?')) return;
+            try { localStorage.removeItem(SOUND_KEY); } catch (e) {}
+            customVoteSound = null;
+            alert('Suara di-reset ke default');
+            console.log('🗑️ Sound reset');
+        });
+    }
+});
+
+// (Monkey-patch dihapus — sound dipanggil langsung dari addVote)

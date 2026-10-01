@@ -57,6 +57,36 @@
         <label>Match Number:</label>
         <input type="number" id="matchInput" value="1" min="1">
       </div>
+      <div class="modal-section">
+        <h3>🖼️ Background</h3>
+        <div class="preset-row">
+          <button class="preset-btn active" data-preset="default" data-color1="#1e1b4b" data-color2="#0a0a15" style="background:linear-gradient(160deg,#1e1b4b,#0a0a15);"></button>
+          <button class="preset-btn" data-preset="ocean" data-color1="#0c4a6e" data-color2="#082f49" style="background:linear-gradient(160deg,#0c4a6e,#082f49);"></button>
+          <button class="preset-btn" data-preset="forest" data-color1="#064e3b" data-color2="#0a0a15" style="background:linear-gradient(160deg,#064e3b,#0a0a15);"></button>
+          <button class="preset-btn" data-preset="sunset" data-color1="#831843" data-color2="#0a0a15" style="background:linear-gradient(160deg,#831843,#0a0a15);"></button>
+          <button class="preset-btn" data-preset="royal" data-color1="#4c1d95" data-color2="#0a0a15" style="background:linear-gradient(160deg,#4c1d95,#0a0a15);"></button>
+        </div>
+        <div class="upload-row">
+          <label for="bgUploadInput" class="upload-btn">📁 Upload Gambar</label>
+          <input type="file" id="bgUploadInput" accept="image/*" style="display:none;">
+          <button id="bgClearBtn" class="clear-btn">🗑️ Hapus</button>
+        </div>
+        <div id="bgPreview" class="bg-preview"></div>
+      </div>
+
+      <div class="modal-section">
+        <h3>🔊 Sound Vote</h3>
+        <div class="modal-field">
+          <label>Suara saat vote (default: ding)</label>
+          <label for="soundUploadInput" class="upload-btn" style="width:100%;text-align:center;display:block;">🎵 Upload Suara Custom</label>
+          <input type="file" id="soundUploadInput" accept="audio/*" style="display:none;">
+        </div>
+        <div class="modal-field" style="display:flex;gap:8px;">
+          <button id="soundTestBtn" style="flex:1;padding:10px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;color:#fff;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">🔊 Test Suara</button>
+          <button id="soundClearBtn" style="flex:1;padding:10px;background:rgba(233,69,96,0.3);border:none;border-radius:8px;color:#fff;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">🗑️ Reset</button>
+        </div>
+      </div>
+
       <div class="modal-actions">
         <button id="saveBtn" class="primary">💾 Simpan</button>
         <button id="cancelBtn">Batal</button>
@@ -85,35 +115,5 @@
       });
     }
   </script>
-  <button id="testRtmpBtn" style="position:fixed;top:70px;left:15px;z-index:100;padding:8px 12px;font-size:11px;font-family:'Nunito',sans-serif;font-weight:800;background:rgba(251,191,36,0.9);color:#1a1a2e;border:none;border-radius:8px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.4);">🔌 Test RTMP</button>
-  <button id="rtmpLiveBtn" style="position:fixed;top:130px;left:15px;z-index:100;padding:10px 14px;font-size:12px;font-family:'Nunito',sans-serif;font-weight:800;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none;border-radius:10px;cursor:pointer;box-shadow:0 4px 15px rgba(220,38,38,0.5);">🔴 LIVE</button>
-
-  <div id="rtmpModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.9);align-items:center;justify-content:center;padding:20px;font-family:'Nunito',sans-serif;">
-    <div style="background:linear-gradient(160deg,#1a1a2e,#0a0a15);border:2px solid #dc2626;border-radius:20px;padding:24px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.7);">
-      <h2 style="color:#dc2626;font-size:20px;margin:0 0 16px 0;text-align:center;letter-spacing:1px;">🎬 LIVE STREAMING</h2>
-      
-      <div id="rtmpStatusBox" style="background:rgba(0,0,0,0.4);border-left:3px solid #fbbf24;padding:10px 14px;border-radius:8px;margin-bottom:16px;font-size:12px;color:#a0a0b0;">
-        Status: <span id="rtmpStatusText" style="color:#fbbf24;font-weight:800;">Siap</span>
-      </div>
-
-      <label style="display:block;font-size:11px;color:#a0a0b0;font-weight:800;letter-spacing:1px;margin-bottom:6px;">RTMP URL</label>
-      <input id="rtmpUrlInput" type="text" value="rtmp://a.rtmp.youtube.com/live2" placeholder="rtmp://..." style="width:100%;padding:12px;border-radius:8px;border:2px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.5);color:#fff;font-size:13px;font-family:monospace;outline:none;margin-bottom:12px;box-sizing:border-box;">
-
-      <label style="display:block;font-size:11px;color:#a0a0b0;font-weight:800;letter-spacing:1px;margin-bottom:6px;">STREAM KEY</label>
-      <input id="rtmpKeyInput" type="text" placeholder="abcd-1234-efgh-5678" style="width:100%;padding:12px;border-radius:8px;border:2px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.5);color:#fff;font-size:13px;font-family:monospace;outline:none;margin-bottom:16px;box-sizing:border-box;">
-
-      <div style="background:rgba(251,191,36,0.1);border-radius:8px;padding:8px 12px;margin-bottom:16px;font-size:11px;color:#a0a0b0;line-height:1.5;">
-        💡 Ambil dari <b style="color:#fbbf24;">YouTube Studio → Create → Go Live</b>
-      </div>
-
-      <div style="display:flex;gap:8px;">
-        <button id="rtmpStartBtn" style="flex:1;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;font-weight:800;font-family:'Nunito',sans-serif;font-size:14px;cursor:pointer;">▶ START LIVE</button>
-        <button id="rtmpStopBtn" style="flex:1;padding:14px;border:none;border-radius:10px;background:rgba(255,255,255,0.1);color:#fff;font-weight:800;font-family:'Nunito',sans-serif;font-size:14px;cursor:pointer;display:none;">⏹ STOP</button>
-        <button id="rtmpCloseBtn" style="padding:14px 18px;border:none;border-radius:10px;background:rgba(255,255,255,0.1);color:#fff;font-weight:800;font-family:'Nunito',sans-serif;font-size:14px;cursor:pointer;">✕</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="js/rtmp.js"></script>
 </body>
 </html>

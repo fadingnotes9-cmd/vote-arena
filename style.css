@@ -1012,3 +1012,131 @@ html, body {
 .vote-item strong {
   white-space: nowrap;
 }
+
+/* ============================================
+   FASE 2: Modal Sections (Background + Sound)
+   ============================================ */
+
+.modal-section {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 14px;
+    margin: 16px 0;
+}
+
+.modal-section h3 {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--c-accent);
+    margin: 0 0 12px 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Preset Background Buttons */
+.preset-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.preset-btn {
+    width: 42px;
+    height: 42px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.preset-btn:hover {
+    transform: scale(1.08);
+    border-color: rgba(255,255,255,0.5);
+}
+
+.preset-btn.active {
+    border-color: #fbbf24;
+    box-shadow: 0 0 12px rgba(251,191,36,0.6);
+    transform: scale(1.05);
+}
+
+/* Upload Row */
+.upload-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.upload-btn {
+    flex: 1;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+    border-radius: 8px;
+    text-align: center;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.upload-btn:active {
+    transform: scale(0.96);
+}
+
+.clear-btn {
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #e94560, #be123c);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.clear-btn:active {
+    transform: scale(0.96);
+}
+
+/* Preview */
+.bg-preview {
+    width: 100%;
+    height: 80px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.3);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+    overflow: hidden;
+    position: relative;
+}
+
+.bg-preview::before {
+    content: "Preview background";
+}
+
+.bg-preview.has-image::before {
+    content: "";
+}
+
+.bg-preview.has-image {
+    border: 2px solid #fbbf24;
+}
