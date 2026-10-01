@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="50%" stop-color="#312e81"/>
+      <stop offset="100%" stop-color="#0a0a15"/>
+    </linearGradient>
+    <radialGradient id="redBall" cx="35%" cy="30%">
+      <stop offset="0%" stop-color="#ff8a95"/>
+      <stop offset="55%" stop-color="#dc2626"/>
+      <stop offset="100%" stop-color="#7f1d1d"/>
+    </radialGradient>
+    <radialGradient id="blueBall" cx="35%" cy="30%">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="55%" stop-color="#0891b2"/>
+      <stop offset="100%" stop-color="#164e63"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <!-- Glow center -->
+  <circle cx="256" cy="256" r="200" fill="url(#glow)"/>
+
+  <!-- Bintang-bintang background -->
+  <circle cx="80" cy="90" r="3" fill="#fff" opacity="0.6"/>
+  <circle cx="420" cy="70" r="2" fill="#fff" opacity="0.5"/>
+  <circle cx="450" cy="400" r="3" fill="#fff" opacity="0.6"/>
+  <circle cx="70" cy="420" r="2" fill="#fff" opacity="0.5"/>
+  <circle cx="150" cy="460" r="2" fill="#fff" opacity="0.4"/>
+  <circle cx="400" cy="150" r="2" fill="#fff" opacity="0.4"/>
+
+  <!-- Bola Merah (kiri) -->
+  <circle cx="150" cy="240" r="85" fill="url(#redBall)" stroke="#fff" stroke-width="5"/>
+  <ellipse cx="125" cy="215" rx="24" ry="16" fill="#fff" opacity="0.55"/>
+  <circle cx="180" cy="215" r="6" fill="#fff" opacity="0.7"/>
+
+  <!-- Bola Biru (kanan) -->
+  <circle cx="362" cy="240" r="85" fill="url(#blueBall)" stroke="#fff" stroke-width="5"/>
+  <ellipse cx="337" cy="215" rx="24" ry="16" fill="#fff" opacity="0.55"/>
+  <circle cx="392" cy="215" r="6" fill="#fff" opacity="0.7"/>
+
+  <!-- VS Text di tengah -->
+  <text x="256" y="270" font-family="Arial Black, sans-serif" font-size="80" font-weight="900"
+        text-anchor="middle" fill="#fbbf24" stroke="#000" stroke-width="3"
+        style="paint-order: stroke; letter-spacing: -2px;">VS</text>
+
+  <!-- Flame icon di bawah -->
+  <text x="256" y="420" font-size="60" text-anchor="middle">🔥</text>
+</svg>
