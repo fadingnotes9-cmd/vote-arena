@@ -42,6 +42,7 @@ public class RTMPPlugin extends Plugin implements ConnectChecker {
     private String currentUrl;
     private String currentKey;
     private boolean useService = false;
+    private PluginCall pendingCall = null;
 
     @PluginMethod
     public void ping(PluginCall call) {
@@ -71,9 +72,31 @@ public class RTMPPlugin extends Plugin implements ConnectChecker {
 
         // Minta izin screen capture via MediaProjection
         try {
+            android.app.Activity activity = getActivity();
+            if (activity == null) {
+                call.reject("Activity tidak tersedia");
+                return;
+            }
+
             MediaProjectionManager mpm = (MediaProjectionManager)
-                getContext().getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+                activity.getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+            if (mpm == null) {
+                call.reject("MediaProjectionManager tidak tersedia");
+                return;
+            }
+
             Intent intent = mpm.createScreenCaptureIntent();
+            if (intent == null) {
+                call.reject("Gagal buat screen capture intent");
+                return;
+            }
+
+            Log.i(TAG, "Intent action: " + intent.getAction());
+            Log.i(TAG, "Intent component: " + intent.getComponent());
+            Log.i(TAG, "Launching activity for result...");
+
+            // Simpan call untuk dipakai nanti di callback
+            this.pendingCall = call;
             startActivityForResult(call, intent, "handleScreenCaptureResult");
             Log.i(TAG, "Screen capture permission requested");
         } catch (Exception e) {
