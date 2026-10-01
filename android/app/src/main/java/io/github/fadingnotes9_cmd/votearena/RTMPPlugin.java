@@ -11,7 +11,6 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 // RootEncoder imports — verify library loads
 import com.pedro.common.ConnectChecker;
 import com.pedro.library.rtmp.RtmpDisplay;
-import com.pedro.library.util.sources.VideoSource;
 
 /**
  * RTMP Plugin untuk Vote Arena
