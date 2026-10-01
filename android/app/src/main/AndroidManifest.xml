@@ -24,12 +24,6 @@
 
         </activity>
 
-        <service
-            android:name="com.pedro.library.screen.ScreenService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="mediaProjection" />
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
