@@ -110,10 +110,16 @@ public class RTMPPlugin extends Plugin implements ConnectChecker {
         Log.i(TAG, "Screen capture result code: " + result.getResultCode());
 
         if (result.getResultCode() != Activity.RESULT_OK) {
+            Log.w(TAG, "Screen capture cancelled/denied");
             JSObject ret = new JSObject();
-            ret.put("status", "permission_denied");
-            ret.put("message", "Izin screen capture ditolak");
+            ret.put("status", "cancelled");
+            ret.put("message", "Dibatalkan user");
             if (call != null) call.resolve(ret);
+            // Beritahu UI untuk reset status
+            JSObject statusData = new JSObject();
+            statusData.put("status", "cancelled");
+            statusData.put("message", "Izin dibatalkan");
+            notifyListeners("rtmpStatus", statusData);
             return;
         }
 

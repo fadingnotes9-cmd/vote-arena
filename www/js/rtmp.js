@@ -58,6 +58,11 @@ class RTMPBridge {
       this.updateUI('stopped', 'Stream berakhir');
       this.toggleButtons(false);
     }
+    else if (s === 'cancelled') {
+      this.isStreaming = false;
+      this.updateUI('ready', 'Siap (dibatalkan)');
+      this.toggleButtons(false);
+    }
   }
 
   updateUI(status, text) {
