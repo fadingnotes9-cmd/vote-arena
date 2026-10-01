@@ -1271,3 +1271,93 @@ html, body {
     min-width: unset !important;
     padding: 14px !important;
 }
+
+/* ============================================
+   FASE 3: Player Sound List
+   ============================================ */
+
+#playerSoundList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.player-sound-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 8px;
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.player-sound-color {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    flex-shrink: 0;
+}
+
+.player-sound-name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.player-sound-upload {
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 11px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.player-sound-upload:active {
+    transform: scale(0.94);
+}
+
+.player-sound-upload.has-sound {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.player-sound-clear {
+    width: 32px;
+    height: 32px;
+    background: rgba(233,69,96,0.3);
+    border: 1px solid rgba(233,69,96,0.5);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.player-sound-clear:active {
+    transform: scale(0.9);
+}
+
+.player-sound-clear:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}

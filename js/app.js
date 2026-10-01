@@ -964,3 +964,146 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // (Monkey-patch dihapus — sound dipanggil langsung dari addVote)
+
+// ============================================
+// FASE 3: Player Sound Per Player
+// ============================================
+
+const PLAYER_SOUNDS_KEY = 'vote-arena-player-sounds';
+let playerSounds = {}; // { playerId: Audio object }
+
+// Load semua sound dari localStorage
+function loadPlayerSounds() {
+    try {
+        const raw = localStorage.getItem(PLAYER_SOUNDS_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        Object.keys(data).forEach(id => {
+            playerSounds[id] = new Audio(data[id]);
+            playerSounds[id].volume = 0.8;
+        });
+        console.log('🎵 Loaded player sounds:', Object.keys(playerSounds).length);
+    } catch (e) {
+        console.warn('Load player sounds error:', e);
+    }
+}
+
+// Save player sound ke localStorage
+function savePlayerSound(playerId, dataUrl) {
+    try {
+        const raw = localStorage.getItem(PLAYER_SOUNDS_KEY);
+        const data = raw ? JSON.parse(raw) : {};
+        if (dataUrl) data[playerId] = dataUrl;
+        else delete data[playerId];
+        localStorage.setItem(PLAYER_SOUNDS_KEY, JSON.stringify(data));
+    } catch (e) {
+        console.warn('Save player sound error:', e);
+    }
+}
+
+// Play sound untuk player tertentu
+function playPlayerSound(playerId) {
+    const sound = playerSounds[playerId];
+    if (sound) {
+        sound.currentTime = 0;
+        sound.play().catch(e => console.warn('Play error:', e));
+        return true;
+    }
+    return false;
+}
+
+// Render player sound list di modal
+function renderPlayerSoundList() {
+    const container = document.getElementById('playerSoundList');
+    if (!container) return;
+    container.innerHTML = '';
+
+    state.players.forEach(p => {
+        const hasSound = !!playerSounds[p.id];
+        const row = document.createElement('div');
+        row.className = 'player-sound-row';
+        row.innerHTML = 
+            '<div class="player-sound-color" style="background:' + p.color + '"></div>' +
+            '<div class="player-sound-name">' + escapeHtml(p.name) + '</div>' +
+            '<button class="player-sound-upload' + (hasSound ? ' has-sound' : '') + '" data-id="' + p.id + '">' +
+                (hasSound ? '✓ Ganti' : '📁 Upload') +
+            '</button>' +
+            '<button class="player-sound-clear" data-id="' + p.id + '"' + (!hasSound ? ' disabled' : '') + '>✕</button>';
+        container.appendChild(row);
+    });
+
+    // Attach handlers
+    container.querySelectorAll('.player-sound-upload').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            // Bikin input file temporary
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'audio/*';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                if (file.size > 300 * 1024) {
+                    alert('File terlalu besar. Max 300KB.');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    playerSounds[id] = new Audio(ev.target.result);
+                    playerSounds[id].volume = 0.8;
+                    savePlayerSound(id, ev.target.result);
+                    renderPlayerSoundList();
+                    console.log('✅ Player sound saved:', id);
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        });
+    });
+
+    container.querySelectorAll('.player-sound-clear').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            if (!playerSounds[id]) return;
+            if (!confirm('Hapus suara custom player ini?')) return;
+            delete playerSounds[id];
+            savePlayerSound(id, null);
+            renderPlayerSoundList();
+            console.log('🗑️ Player sound cleared:', id);
+        });
+    });
+}
+
+// Load sounds + render saat DOM ready
+window.addEventListener('DOMContentLoaded', () => {
+    loadPlayerSounds();
+    // Render ulang saat modal dibuka
+    const setupBtn = document.getElementById('setupBtn');
+    if (setupBtn) {
+        setupBtn.addEventListener('click', () => {
+            setTimeout(renderPlayerSoundList, 50);
+        });
+    }
+});
+
+// Hook ke addVote — play player sound kalau ada, else global sound
+window.addEventListener('load', () => {
+    if (typeof window.addVote !== 'function') return;
+    const originalAddVote = window.addVote;
+    window.addVote = function(playerId, username, isSuper, amount) {
+        // Play player sound DULU sebelum original (yang main global sound)
+        if (!isSuper && playPlayerSound(playerId)) {
+            // Player sound played — skip global sound
+            // Tapi tetap panggil original dengan flag supaya global sound di-skip
+            const originalPlayVoteSound = window.playVoteSound;
+            window.playVoteSound = function() {}; // temporary no-op
+            try {
+                return originalAddVote.apply(this, arguments);
+            } finally {
+                window.playVoteSound = originalPlayVoteSound;
+            }
+        }
+        return originalAddVote.apply(this, arguments);
+    };
+    console.log('🎵 addVote hooked for player sounds');
+});
