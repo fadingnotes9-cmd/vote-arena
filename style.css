@@ -1524,3 +1524,15 @@ canvas {
     transform: translateZ(0);
     backface-visibility: hidden;
 }
+
+
+/* Marquee Input */
+#marqueeInput:focus {
+    border-color: var(--c-accent) !important;
+    box-shadow: 0 0 0 3px rgba(251,191,36,0.15);
+}
+
+#marqueeInput::placeholder {
+    color: rgba(255,255,255,0.3);
+    font-style: italic;
+}

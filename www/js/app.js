@@ -1164,3 +1164,104 @@ window.addEventListener('load', () => {
 });
 
 console.log('✅ Marquee dynamic text ready');
+
+
+// ============================================
+// MARQUEE CUSTOM TEXT
+// ============================================
+const MARQUEE_KEY = 'vote-arena-marquee-text';
+
+// Update marquee — override fungsi sebelumnya
+const _originalUpdateMarqueeText = window.updateMarqueeText;
+window.updateMarqueeText = function() {
+    const el = document.getElementById('marqueeText');
+    if (!el) return;
+
+    // Cek custom text dulu
+    let customText = null;
+    try {
+        customText = localStorage.getItem(MARQUEE_KEY);
+    } catch (e) {}
+
+    if (customText && customText.trim()) {
+        // Pakai custom text (duplicate untuk loop halus)
+        el.innerHTML = customText + ' &nbsp;&nbsp;&nbsp;&nbsp; ' + customText;
+        return;
+    }
+
+    // Fallback: auto-generate dari nama player
+    const names = state.players.map(p => p.name.toUpperCase());
+    const playerList = names.length > 0 
+        ? names.map(n => '<strong>' + escapeHtml(n) + '</strong>').join(' ATAU ')
+        : '<strong>PEMAIN 1</strong> ATAU <strong>PEMAIN 2</strong>';
+
+    const tagline = 
+        '⚽ KETIK ' + playerList + ' DI CHAT UNTUK VOTE' +
+        ' &nbsp;&nbsp; ⚽ SUPER CHAT = +5 POIN' +
+        ' &nbsp;&nbsp; 🏆 FIRST TO ' + state.target + ' MENANG!' +
+        ' &nbsp;&nbsp; 🎉 TROPHY + CONFETTI UNTUK PEMENANG' +
+        ' &nbsp;&nbsp; 💬 KETIK ' + playerList + ' DI CHAT UNTUK VOTE' +
+        ' &nbsp;&nbsp; ⚽ SUPER CHAT = +5 POIN' +
+        ' &nbsp;&nbsp; 🏆 FIRST TO ' + state.target + ' MENANG!';
+
+    el.innerHTML = tagline;
+};
+
+// Preset texts
+const MARQUEE_PRESETS = {
+    preset1: '⚽ KETIK <strong>MESSI</strong> ATAU <strong>RONALDO</strong> DI CHAT UNTUK VOTE ⚽ SUPER CHAT = +5 POIN ⚽ FIRST TO 100 MENANG! 🏆',
+    preset2: '🔥 GOAT BATTLE LIVE! KETIK NAMA PEMAIN FAVORITMU SEKARANG! 🔥 SUPER CHAT = +5 POIN 💰 FIRST TO 100 MENANG 🏆',
+    preset3: '🎉 SELAMAT DATANG DI ARENA! VOTE PEMAIN FAVORITMU DI CHAT! 🎉 TROPHY + CONFETTI UNTUK PEMENANG! 🏆 SUPER CHAT = +5 POIN 💰'
+};
+
+// Setup handlers saat DOM ready
+window.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('marqueeInput');
+    if (!input) return;
+
+    // Load saved text
+    try {
+        const saved = localStorage.getItem(MARQUEE_KEY);
+        if (saved) input.value = saved;
+    } catch (e) {}
+
+    // Auto-save saat user ketik (debounced)
+    let saveTimer = null;
+    input.addEventListener('input', () => {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+            const val = input.value.trim();
+            try {
+                if (val) localStorage.setItem(MARQUEE_KEY, val);
+                else localStorage.removeItem(MARQUEE_KEY);
+            } catch (e) {}
+            window.updateMarqueeText();
+            console.log('📜 Marquee saved:', val ? val.substring(0, 40) + '...' : '(auto)');
+        }, 500);
+    });
+
+    // Preset buttons
+    ['preset1', 'preset2', 'preset3'].forEach(key => {
+        const btn = document.getElementById('marquee' + key.charAt(0).toUpperCase() + key.slice(1));
+        if (btn) {
+            btn.addEventListener('click', () => {
+                const text = MARQUEE_PRESETS[key];
+                input.value = text;
+                try { localStorage.setItem(MARQUEE_KEY, text); } catch (e) {}
+                window.updateMarqueeText();
+                console.log('📜 Preset applied:', key);
+            });
+        }
+    });
+
+    console.log('📜 Marquee input handlers ready');
+});
+
+// Init saat load
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        if (typeof window.updateMarqueeText === 'function') {
+            window.updateMarqueeText();
+        }
+    }, 300);
+});
